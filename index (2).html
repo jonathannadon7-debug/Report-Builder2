@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Builder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .lang-toggle-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 10px 20px;
+            border: 2px solid white;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .lang-toggle-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+
+        .header h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.3);
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: white;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .content {
+            padding: 40px 30px;
+        }
+
+        .step {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .step-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .step-subtitle {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .logo-upload-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .logo-preview-container {
+            width: 150px;
+            height: 150px;
+            border: 3px dashed #2a5298;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9ff;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .logo-preview-container:hover {
+            border-color: #1e3c72;
+            transform: scale(1.05);
+        }
+
+        .logo-preview-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .logo-placeholder {
+            text-align: center;
+            color: #2a5298;
+        }
+
+        .logo-placeholder-icon {
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .logo-placeholder-icon svg {
+            stroke: currentColor;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="date"],
+        input[type="time"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #2a5298;
+            box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .photo-upload-area {
+            border: 3px dashed #2a5298;
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            background: #f8f9ff;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .photo-upload-area:hover {
+            background: #f0f2ff;
+            border-color: #1e3c72;
+        }
+
+        .photo-upload-area.drag-over {
+            background: #e8ebff;
+            border-color: #1e3c72;
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            margin-bottom: 15px;
+            color: #2a5298;
+            display: flex;
+            justify-content: center;
+        }
+
+        .upload-icon svg {
+            stroke: currentColor;
+        }
+
+        .upload-text {
+            font-size: 16px;
+            color: #2a5298;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .upload-subtext {
+            font-size: 14px;
+            color: #999;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .photo-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            aspect-ratio: 1;
+            border: 2px solid #e0e0e0;
+            background: #f5f5f5;
+        }
+
+        .photo-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-remove {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .photo-remove:hover {
+            background: #c82333;
+            transform: scale(1.1);
+        }
+
+        .photo-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px;
+            font-size: 12px;
+        }
+
+        .photo-caption input {
+            background: transparent;
+            border: none;
+            color: white;
+            width: 100%;
+            padding: 0;
+            font-size: 12px;
+        }
+
+        .photo-caption input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(42, 82, 152, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+            font-size: 18px;
+            padding: 16px 32px;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.4);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: space-between;
+        }
+
+        .summary-section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .summary-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2a5298;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #2a5298;
+        }
+
+        .summary-item {
+            display: flex;
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .summary-label {
+            font-weight: 600;
+            color: #555;
+            min-width: 140px;
+        }
+
+        .summary-value {
+            color: #333;
+        }
+
+        .photo-count {
+            display: inline-block;
+            background: #2a5298;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .success-message {
+            text-align: center;
+        }
+
+        .success-message h2 {
+            font-size: 28px;
+            color: #28a745;
+            margin-bottom: 15px;
+        }
+
+        .success-message p {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #2a5298;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 0;
+            }
+
+            .header {
+                padding: 30px 20px;
+            }
+            
+            .lang-toggle-btn {
+                top: 10px;
+                right: 10px;
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+
+            .content {
+                padding: 30px 20px;
+            }
+
+            .button-group {
+                flex-direction: column-reverse;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            @page {
+                margin: 0;
+                size: auto;
+            }
+            
+            body {
+                background: white;
+                padding: 0;
+                margin: 1cm 1.5cm;
+            }
+            .container {
+                box-shadow: none;
+                max-width: 100%;
+                border-radius: 0;
+            }
+            .header {
+                background: white !important;
+                color: #333 !important;
+                border-bottom: 3px solid #2a5298;
+            }
+            .header p {
+                display: none !important;
+            }
+            .progress-bar, 
+            .button-group, 
+            .step-subtitle,
+            .photo-remove,
+            .step-title {
+                display: none !important;
+            }
+            .content {
+                padding: 20px;
+                padding-bottom: 60px;
+            }
+            .summary-section {
+                page-break-inside: avoid;
+                background: white;
+                border: 1px solid #ddd;
+            }
+            .photo-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .photo-item {
+                page-break-inside: avoid;
+            }
+            
+            /* Custom page footer */
+            .print-footer {
+                display: block !important;
+                position: fixed;
+                bottom: 20px;
+                left: 0;
+                right: 0;
+                padding: 15px 30px;
+                border-top: 2px solid #2a5298;
+                font-size: 11px;
+                color: #333;
+                background: white;
+                font-weight: 600;
+            }
+        }
+        
+        .print-footer {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <button onclick="toggleLanguage()" class="lang-toggle-btn">
+                <span id="langToggle">🇪🇸 Español</span>
+            </button>
+            <h1 data-en="Report Builder" data-es="Generador de Informes">Report Builder</h1>
+            <p data-en="Professional Reports Made Easy" data-es="Informes Profesionales Fáciles">Professional Reports Made Easy</p>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <div class="content">
+            <!-- Step 1: Basic Information -->
+            <div class="step active" id="step1">
+                <div class="step-title" data-en="Basic Information" data-es="Información Básica">Basic Information</div>
+                <div class="step-subtitle" data-en="Essential details for your report" data-es="Detalles esenciales para su informe">Essential details for your report</div>
+
+                <div class="form-group">
+                    <label data-en="Company/Organization Logo (Optional)" data-es="Logo de Empresa/Organización (Opcional)">Company/Organization Logo (Optional)</label>
+                    <div class="logo-upload-section">
+                        <div class="logo-preview-container" id="brandLogoPreview" onclick="document.getElementById('brandLogoInput').click()">
+                            <div class="logo-placeholder">
+                                <div class="logo-placeholder-icon">
+                                    <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                        <polyline points="21 15 16 10 5 21"></polyline>
+                                    </svg>
+                                </div>
+                                <div style="font-size: 12px;" data-en="Click to upload logo" data-es="Haz clic para subir logo">Click to upload logo</div>
+                            </div>
+                        </div>
+                        <input type="file" id="brandLogoInput" accept="image/*">
+                        <div style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
+                            <button class="btn btn-secondary" type="button" onclick="document.getElementById('brandLogoCameraInput').click()" style="font-size: 14px; padding: 10px 20px;">
+                                <span data-en="Use Camera" data-es="Usar Cámara">Use Camera</span>
+                            </button>
+                            <button class="btn btn-secondary" type="button" onclick="removeBrandLogo()" id="removeBrandLogoBtn" style="display: none; font-size: 14px; padding: 10px 20px;">
+                                <span data-en="Remove" data-es="Eliminar">Remove</span>
+                            </button>
+                        </div>
+                        <input type="file" id="brandLogoCameraInput" accept="image/*" capture="environment">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-en="Report Title *" data-es="Título del Informe *">Report Title *</label>
+                    <input type="text" id="reportTitle" data-placeholder-en="e.g., Site Inspection Report" data-placeholder-es="ej., Informe de Inspección del Sitio" placeholder="e.g., Site Inspection Report" required>
+                </div>
+
+                <div class="form-group">
+                    <label data-en="Your Name *" data-es="Su Nombre *">Your Name *</label>
+                    <input type="text" id="reporterName" data-placeholder-en="John Doe" data-placeholder-es="Juan Pérez" placeholder="John Doe" required>
+                </div>
+
+                <div class="form-group">
+                    <label data-en="Your Role/Position" data-es="Su Cargo/Posición">Your Role/Position</label>
+                    <input type="text" id="reporterRole" data-placeholder-en="e.g., Inspector, Manager" data-placeholder-es="ej., Inspector, Gerente" placeholder="e.g., Inspector, Manager">
+                </div>
+
+                <div class="form-group">
+                    <label data-en="Organization/Company Name" data-es="Nombre de Organización/Empresa">Organization/Company Name</label>
+                    <input type="text" id="organization" data-placeholder-en="Company Name" data-placeholder-es="Nombre de Empresa" placeholder="Company Name">
+                </div>
+
+                <div class="button-group">
+                    <div></div>
+                    <button class="btn btn-primary" type="button" onclick="nextStep()"><span data-en="Next →" data-es="Siguiente →">Next →</span></button>
+                </div>
+            </div>
+
+            <!-- Step 2: Location & Date -->
+            <div class="step" id="step2">
+                <div class="step-title" data-en="Location & Time" data-es="Ubicación y Hora">Location & Time</div>
+                <div class="step-subtitle" data-en="When and where did this happen?" data-es="¿Cuándo y dónde sucedió esto?">When and where did this happen?</div>
+
+                <div class="form-group">
+                    <label data-en="Location *" data-es="Ubicación *">Location *</label>
+                    <input type="text" id="location" data-placeholder-en="e.g., Building A, 123 Main St" data-placeholder-es="ej., Edificio A, Calle Principal 123" placeholder="e.g., Building A, 123 Main St" required>
+                </div>
+
+                <div class="form-group">
+                    <label data-en="Date *" data-es="Fecha *">Date *</label>
+                    <input type="date" id="reportDate" required>
+                </div>
+
+                <div class="form-group">
+                    <label data-en="Time" data-es="Hora">Time</label>
+                    <input type="time" id="reportTime">
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-secondary" type="button" onclick="prevStep()"><span data-en="← Back" data-es="← Atrás">← Back</span></button>
+                    <button class="btn btn-primary" type="button" onclick="nextStep()"><span data-en="Next →" data-es="Siguiente →">Next →</span></button>
+                </div>
+            </div>
+
+            <!-- Step 3: Report Type & Details -->
+            <div class="step" id="step3">
+                <div class="step-title" data-en="Report Details" data-es="Detalles del Informe">Report Details</div>
+                <div class="step-subtitle" data-en="Tell us about what you're reporting" data-es="Cuéntenos sobre lo que está informando">Tell us about what you're reporting</div>
+
+                <div class="form-group">
+                    <label data-en="Report Type *" data-es="Tipo de Informe *">Report Type *</label>
+                    <select id="reportType" required>
+                        <option value="" data-en="Select type..." data-es="Seleccionar tipo...">Select type...</option>
+                        <option value="Inspection" data-en="Inspection" data-es="Inspección">Inspection</option>
+                        <option value="Incident" data-en="Incident" data-es="Incidente">Incident</option>
+                        <option value="Maintenance" data-en="Maintenance" data-es="Mantenimiento">Maintenance</option>
+                        <option value="Safety" data-en="Safety" data-es="Seguridad">Safety</option>
+                        <option value="Quality Check" data-en="Quality Check" data-es="Control de Calidad">Quality Check</option>
+                        <option value="Site Visit" data-en="Site Visit" data-es="Visita al Sitio">Site Visit</option>
+                        <option value="Other" data-en="Other" data-es="Otro">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label data-en="Status" data-es="Estado">Status</label>
+                    <select id="reportStatus">
+                        <option value="Completed" data-en="Completed" data-es="Completado">Completed</option>
+                        <option value="In Progress" data-en="In Progress" data-es="En Progreso">In Progress</option>
+                        <option value="Pending" data-en="Pending" data-es="Pendiente">Pending</option>
+                        <option value="Needs Attention" data-en="Needs Attention" data-es="Requiere Atención">Needs Attention</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label data-en="Priority Level" data-es="Nivel de Prioridad">Priority Level</label>
+                    <select id="priorityLevel">
+                        <option value="Low" data-en="Low" data-es="Baja">Low</option>
+                        <option value="Medium" data-en="Medium" data-es="Media">Medium</option>
+                        <option value="High" data-en="High" data-es="Alta">High</option>
+                        <option value="Critical" data-en="Critical" data-es="Crítica">Critical</option>
+                    </select>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-secondary" type="button" onclick="prevStep()"><span data-en="← Back" data-es="← Atrás">← Back</span></button>
+                    <button class="btn btn-primary" type="button" onclick="nextStep()"><span data-en="Next →" data-es="Siguiente →">Next →</span></button>
+                </div>
+            </div>
+
+            <!-- Step 4: Description -->
+            <div class="step" id="step4">
+                <div class="step-title" data-en="Description" data-es="Descripción">Description</div>
+                <div class="step-subtitle" data-en="Provide detailed information" data-es="Proporcione información detallada">Provide detailed information</div>
+
+                <div class="form-group">
+                    <label data-en="Summary *" data-es="Resumen *">Summary *</label>
+                    <textarea id="summary" data-placeholder-en="Brief overview of the report..." data-placeholder-es="Breve descripción del informe..." placeholder="Brief overview of the report..." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label data-en="Detailed Findings" data-es="Hallazgos Detallados">Detailed Findings</label>
+                    <textarea id="findings" data-placeholder-en="Detailed observations, findings, or notes..." data-placeholder-es="Observaciones detalladas, hallazgos o notas..." placeholder="Detailed observations, findings, or notes..." style="min-height: 150px;"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label data-en="Recommendations" data-es="Recomendaciones">Recommendations</label>
+                    <textarea id="recommendations" data-placeholder-en="Any recommendations or action items..." data-placeholder-es="Cualquier recomendación o elementos de acción..." placeholder="Any recommendations or action items..."></textarea>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-secondary" type="button" onclick="prevStep()"><span data-en="← Back" data-es="← Atrás">← Back</span></button>
+                    <button class="btn btn-primary" type="button" onclick="nextStep()"><span data-en="Next →" data-es="Siguiente →">Next →</span></button>
+                </div>
+            </div>
+
+            <!-- Step 5: Photos -->
+            <div class="step" id="step5">
+                <div class="step-title" data-en="Upload Photos" data-es="Subir Fotos">Upload Photos</div>
+                <div class="step-subtitle" data-en="Add visual documentation (optional)" data-es="Agregar documentación visual (opcional)">Add visual documentation (optional)</div>
+
+                <div class="photo-upload-area" id="uploadArea" onclick="document.getElementById('photoInput').click()">
+                    <div class="upload-icon">
+                        <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                            <circle cx="12" cy="13" r="4"></circle>
+                        </svg>
+                    </div>
+                    <div class="upload-text" data-en="Click to upload or drag & drop photos" data-es="Haz clic para subir o arrastra fotos">Click to upload or drag & drop photos</div>
+                    <div class="upload-subtext" data-en="You can upload multiple images" data-es="Puedes subir múltiples imágenes">You can upload multiple images</div>
+                </div>
+
+                <input type="file" id="photoInput" accept="image/*" multiple>
+                <input type="file" id="cameraInput" accept="image/*" capture="environment">
+
+                <button class="btn btn-primary" type="button" onclick="document.getElementById('cameraInput').click()" style="margin-bottom: 20px;">
+                    <span data-en="Take Photo with Camera" data-es="Tomar Foto con Cámara">Take Photo with Camera</span>
+                </button>
+
+                <div class="photo-grid" id="photoGrid"></div>
+
+                <div class="button-group">
+                    <button class="btn btn-secondary" type="button" onclick="prevStep()"><span data-en="← Back" data-es="← Atrás">← Back</span></button>
+                    <button class="btn btn-primary" type="button" onclick="nextStep()"><span data-en="Next →" data-es="Siguiente →">Next →</span></button>
+                </div>
+            </div>
+
+            <!-- Step 6: Review & Generate -->
+            <div class="step" id="step6">
+                <div class="step-title" data-en="Review & Generate Report" data-es="Revisar y Generar Informe">Review & Generate Report</div>
+                <div class="step-subtitle" data-en="Double-check everything before generating your PDF" data-es="Verifique todo antes de generar su PDF">Double-check everything before generating your PDF</div>
+
+                <div id="reviewContent"></div>
+                
+                <div class="print-footer" id="printFooter">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span id="footerCompany"></span>
+                        <span id="footerDateTime"></span>
+                    </div>
+                </div>
+
+                <div class="button-group" id="printButtons">
+                    <button class="btn btn-secondary" type="button" onclick="prevStep()"><span data-en="← Back" data-es="← Atrás">← Back</span></button>
+                    <button class="btn btn-success" type="button" onclick="generatePDFReport()">
+                        <span data-en="📄 Generate PDF Report" data-es="📄 Generar Informe PDF">📄 Generate PDF Report</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div class="loading" id="loadingState">
+                <div class="spinner"></div>
+                <div style="font-size: 18px; color: #2a5298; font-weight: 600;" data-en="Preparing your report..." data-es="Preparando su informe...">Preparing your report...</div>
+                <div style="font-size: 14px; color: #999; margin-top: 10px;" data-en="This will just take a moment" data-es="Esto solo tomará un momento">This will just take a moment</div>
+            </div>
+
+            <!-- Success State -->
+            <div class="step" id="successStep">
+                <div class="success-message">
+                    <div style="font-size: 60px; margin-bottom: 20px;">✓</div>
+                    <h2 data-en="Report Ready!" data-es="¡Informe Listo!">Report Ready!</h2>
+                    <p data-en="Use the print dialog to save your report as PDF." data-es="Use el diálogo de impresión para guardar su informe como PDF.">Use the print dialog to save your report as PDF.</p>
+                    <button class="btn btn-success" type="button" onclick="location.reload()">
+                        <span data-en="Create Another Report" data-es="Crear Otro Informe">Create Another Report</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 6;
+        let photos = [];
+        let brandLogo = null;
+
+        // Initialize
+        document.getElementById('reportDate').valueAsDate = new Date();
+        const now = new Date();
+        document.getElementById('reportTime').value = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+
+        // Logo event listeners
+        document.getElementById('brandLogoInput').addEventListener('change', handleBrandLogoUpload);
+        document.getElementById('brandLogoCameraInput').addEventListener('change', handleBrandLogoUpload);
+
+        // Photo event listeners
+        document.getElementById('photoInput').addEventListener('change', handlePhotoUpload);
+        document.getElementById('cameraInput').addEventListener('change', handlePhotoUpload);
+
+        // Drag and drop
+        const uploadArea = document.getElementById('uploadArea');
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('drag-over');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('drag-over');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        function handleBrandLogoUpload(event) {
+            const file = event.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    brandLogo = e.target.result;
+                    displayBrandLogo(brandLogo);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function displayBrandLogo(imageSrc) {
+            const preview = document.getElementById('brandLogoPreview');
+            preview.innerHTML = `<img src="${imageSrc}" alt="Company Logo">`;
+            document.getElementById('removeBrandLogoBtn').style.display = 'inline-block';
+        }
+
+        function removeBrandLogo() {
+            brandLogo = null;
+            const uploadText = currentLanguage === 'en' ? 'Click to upload logo' : 'Haz clic para subir logo';
+            const preview = document.getElementById('brandLogoPreview');
+            preview.innerHTML = `
+                <div class="logo-placeholder">
+                    <div class="logo-placeholder-icon">
+                        <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                    </div>
+                    <div style="font-size: 12px;" data-en="Click to upload logo" data-es="Haz clic para subir logo">${uploadText}</div>
+                </div>
+            `;
+            document.getElementById('removeBrandLogoBtn').style.display = 'none';
+            document.getElementById('brandLogoInput').value = '';
+            document.getElementById('brandLogoCameraInput').value = '';
+        }
+
+        function handlePhotoUpload(event) {
+            handleFiles(event.target.files);
+        }
+
+        function handleFiles(files) {
+            Array.from(files).forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        photos.push({
+                            src: e.target.result,
+                            caption: ''
+                        });
+                        displayPhotos();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        function displayPhotos() {
+            const photoGrid = document.getElementById('photoGrid');
+            photoGrid.innerHTML = '';
+            
+            const captionPlaceholder = currentLanguage === 'en' ? 'Add caption...' : 'Agregar descripción...';
+            
+            photos.forEach((photo, index) => {
+                const photoItem = document.createElement('div');
+                photoItem.className = 'photo-item';
+                photoItem.innerHTML = `
+                    <img src="${photo.src}" alt="Photo ${index + 1}">
+                    <button class="photo-remove" onclick="removePhoto(${index})">×</button>
+                    <div class="photo-caption">
+                        <input type="text" placeholder="${captionPlaceholder}" value="${photo.caption}" 
+                               onchange="updateCaption(${index}, this.value)">
+                    </div>
+                `;
+                photoGrid.appendChild(photoItem);
+            });
+        }
+
+        function removePhoto(index) {
+            photos.splice(index, 1);
+            displayPhotos();
+        }
+
+        function updateCaption(index, caption) {
+            photos[index].caption = caption;
+        }
+
+        function updateProgress() {
+            const progress = (currentStep / totalSteps) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function nextStep() {
+            const currentStepEl = document.getElementById(`step${currentStep}`);
+            const requiredInputs = currentStepEl.querySelectorAll('[required]');
+            let isValid = true;
+
+            requiredInputs.forEach(input => {
+                if (!input.value.trim()) {
+                    isValid = false;
+                    input.style.borderColor = '#dc3545';
+                    setTimeout(() => {
+                        input.style.borderColor = '#e0e0e0';
+                    }, 2000);
+                }
+            });
+
+            if (!isValid) {
+                const msg = currentLanguage === 'en' ? 'Please fill in all required fields' : 'Por favor complete todos los campos requeridos';
+                alert(msg);
+                return;
+            }
+
+            if (currentStep === 5) {
+                generateReview();
+            }
+
+            if (currentStep < totalSteps) {
+                document.getElementById(`step${currentStep}`).classList.remove('active');
+                currentStep++;
+                document.getElementById(`step${currentStep}`).classList.add('active');
+                updateProgress();
+                window.scrollTo(0, 0);
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                document.getElementById(`step${currentStep}`).classList.remove('active');
+                currentStep--;
+                document.getElementById(`step${currentStep}`).classList.add('active');
+                updateProgress();
+                window.scrollTo(0, 0);
+            }
+        }
+
+        function generateReview() {
+            const reviewContent = document.getElementById('reviewContent');
+            const data = collectFormData();
+            
+            // Translation labels
+            const labels = {
+                en: {
+                    basicInfo: 'Basic Information',
+                    reportTitle: 'Report Title:',
+                    reporter: 'Reporter:',
+                    organization: 'Organization:',
+                    locationTime: 'Location & Time',
+                    location: 'Location:',
+                    date: 'Date:',
+                    time: 'Time:',
+                    reportDetails: 'Report Details',
+                    type: 'Type:',
+                    status: 'Status:',
+                    priority: 'Priority:',
+                    description: 'Description',
+                    summary: 'Summary:',
+                    findings: 'Findings:',
+                    recommendations: 'Recommendations:',
+                    photos: 'Photos',
+                    photo: 'photo',
+                    photos_plural: 'photos',
+                    noPhotos: 'No photos added'
+                },
+                es: {
+                    basicInfo: 'Información Básica',
+                    reportTitle: 'Título del Informe:',
+                    reporter: 'Reportero:',
+                    organization: 'Organización:',
+                    locationTime: 'Ubicación y Hora',
+                    location: 'Ubicación:',
+                    date: 'Fecha:',
+                    time: 'Hora:',
+                    reportDetails: 'Detalles del Informe',
+                    type: 'Tipo:',
+                    status: 'Estado:',
+                    priority: 'Prioridad:',
+                    description: 'Descripción',
+                    summary: 'Resumen:',
+                    findings: 'Hallazgos:',
+                    recommendations: 'Recomendaciones:',
+                    photos: 'Fotos',
+                    photo: 'foto',
+                    photos_plural: 'fotos',
+                    noPhotos: 'No se agregaron fotos'
+                }
+            };
+            
+            const t = labels[currentLanguage];
+            const photoText = photos.length === 1 ? t.photo : t.photos_plural;
+
+            reviewContent.innerHTML = `
+                ${brandLogo ? `
+                <div class="summary-section" style="text-align: center;">
+                    <img src="${brandLogo}" alt="Company Logo" style="max-width: 200px; max-height: 100px; margin-bottom: 15px;">
+                </div>
+                ` : ''}
+                
+                <div class="summary-section">
+                    <div class="summary-title">${t.basicInfo}</div>
+                    <div class="summary-item">
+                        <span class="summary-label">${t.reportTitle}</span>
+                        <span class="summary-value">${data.reportTitle}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">${t.reporter}</span>
+                        <span class="summary-value">${data.reporterName}${data.reporterRole ? ' - ' + data.reporterRole : ''}</span>
+                    </div>
+                    ${data.organization ? `
+                    <div class="summary-item">
+                        <span class="summary-label">${t.organization}</span>
+                        <span class="summary-value">${data.organization}</span>
+                    </div>
+                    ` : ''}
+                </div>
+
+                <div class="summary-section">
+                    <div class="summary-title">${t.locationTime}</div>
+                    <div class="summary-item">
+                        <span class="summary-label">${t.location}</span>
+                        <span class="summary-value">${data.location}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">${t.date}</span>
+                        <span class="summary-value">${data.reportDate}</span>
+                    </div>
+                    ${data.reportTime ? `
+                    <div class="summary-item">
+                        <span class="summary-label">${t.time}</span>
+                        <span class="summary-value">${data.reportTime}</span>
+                    </div>
+                    ` : ''}
+                </div>
+
+                <div class="summary-section">
+                    <div class="summary-title">${t.reportDetails}</div>
+                    <div class="summary-item">
+                        <span class="summary-label">${t.type}</span>
+                        <span class="summary-value">${data.reportType}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">${t.status}</span>
+                        <span class="summary-value">${data.reportStatus}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">${t.priority}</span>
+                        <span class="summary-value">${data.priorityLevel}</span>
+                    </div>
+                </div>
+
+                <div class="summary-section">
+                    <div class="summary-title">${t.description}</div>
+                    <div class="summary-item">
+                        <span class="summary-label">${t.summary}</span>
+                        <span class="summary-value">${data.summary}</span>
+                    </div>
+                    ${data.findings ? `
+                    <div class="summary-item">
+                        <span class="summary-label">${t.findings}</span>
+                        <span class="summary-value">${data.findings}</span>
+                    </div>
+                    ` : ''}
+                    ${data.recommendations ? `
+                    <div class="summary-item">
+                        <span class="summary-label">${t.recommendations}</span>
+                        <span class="summary-value">${data.recommendations}</span>
+                    </div>
+                    ` : ''}
+                </div>
+
+                <div class="summary-section">
+                    <div class="summary-title">
+                        ${t.photos}
+                        <span class="photo-count">${photos.length} ${photoText}</span>
+                    </div>
+                    ${photos.length > 0 ? '<div class="photo-grid">' + photos.map((photo, i) => `
+                        <div class="photo-item">
+                            <img src="${photo.src}" alt="${t.photos} ${i + 1}">
+                            ${photo.caption ? `<div class="photo-caption" style="position: relative;">${photo.caption}</div>` : ''}
+                        </div>
+                    `).join('') + '</div>' : `<p style="color: #999;">${t.noPhotos}</p>`}
+                </div>
+            `;
+            
+            // Update footer
+            const companyName = data.organization || 'Report';
+            const dateTime = `${data.reportDate}${data.reportTime ? ' at ' + data.reportTime : ''}`;
+            document.getElementById('footerCompany').textContent = companyName;
+            document.getElementById('footerDateTime').textContent = dateTime;
+        }
+
+        function collectFormData() {
+            return {
+                reportTitle: document.getElementById('reportTitle').value,
+                reporterName: document.getElementById('reporterName').value,
+                reporterRole: document.getElementById('reporterRole').value,
+                organization: document.getElementById('organization').value,
+                location: document.getElementById('location').value,
+                reportDate: document.getElementById('reportDate').value,
+                reportTime: document.getElementById('reportTime').value,
+                reportType: document.getElementById('reportType').value,
+                reportStatus: document.getElementById('reportStatus').value,
+                priorityLevel: document.getElementById('priorityLevel').value,
+                summary: document.getElementById('summary').value,
+                findings: document.getElementById('findings').value,
+                recommendations: document.getElementById('recommendations').value
+            };
+        }
+
+        function generatePDFReport() {
+            window.print();
+        }
+
+        // Initialize
+        updateProgress();
+        
+        // Language toggle functionality
+        let currentLanguage = 'en';
+        
+        function toggleLanguage() {
+            currentLanguage = currentLanguage === 'en' ? 'es' : 'en';
+            updateLanguage();
+        }
+        
+        function updateLanguage() {
+            const lang = currentLanguage;
+            
+            // Update language toggle button
+            document.getElementById('langToggle').textContent = lang === 'en' ? '🇪🇸 Español' : '🇬🇧 English';
+            
+            // Update all elements with data-en and data-es attributes
+            document.querySelectorAll('[data-en]').forEach(element => {
+                if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+                    // Update placeholder
+                    const placeholder = element.getAttribute('data-placeholder-' + lang);
+                    if (placeholder) {
+                        element.placeholder = placeholder;
+                    }
+                } else if (element.tagName === 'OPTION') {
+                    // Update option text
+                    element.textContent = element.getAttribute('data-' + lang);
+                } else {
+                    // Update regular text content
+                    element.textContent = element.getAttribute('data-' + lang);
+                }
+            });
+            
+            // Update alert messages
+            window.alertMessages = {
+                en: {
+                    fillRequired: 'Please fill in all required fields',
+                    photo: 'Photo'
+                },
+                es: {
+                    fillRequired: 'Por favor complete todos los campos requeridos',
+                    photo: 'Foto'
+                }
+            };
+            
+            // Update review section labels if on review page
+            if (currentStep === 6) {
+                generateReview();
+            }
+        }
+    </script>
+</body>
+</html>
